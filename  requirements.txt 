@@ -1,0 +1,25 @@
+
+# Core Data Processing
+numpy
+pandas
+python-dateutil
+pytz
+
+# NLP and Text Processing
+nltk
+spacy
+textblob
+vaderSentiment
+gensim
+
+# Financial Data
+yfinance
+pandas-datareader
+ta-lib
+
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
