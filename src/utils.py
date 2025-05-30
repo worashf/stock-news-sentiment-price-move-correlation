@@ -14,3 +14,4 @@ def load_csv_finantial_data(file_path:str) -> pd.DataFrame:
         raise FileNotFoundError(f"File {file_path} does not exist")
     except Exception as e:
         raise e
+
