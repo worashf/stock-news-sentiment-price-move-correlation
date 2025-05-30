@@ -6,10 +6,12 @@
 ## 🚀 Overview
 This project analyzes financial news headlines and stock price data to explore the relationship between **news sentiment** and **stock performance**. The objective is to quantify sentiment using NLP techniques and correlate it with stock market behavior to generate **predictive insights** and **investment strategies**.
 
-This project was completed as part of **10 Academy: Artificial Intelligence Mastery**, under the guidance of **Worash Abocherugn**, to build mastery in:
-- Data Engineering (DE)
+This project was completed as part of **10 Academy: Artificial Intelligence Mastery**, to build mastery in:
+- EDA
 - Financial Analytics (FA)
-- Machine Learning Engineering (MLE)
+- NLP
+- Statistics
+- ML
 
 
 
