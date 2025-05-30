@@ -12,6 +12,8 @@ This project was completed as part of **10 Academy: Artificial Intelligence Mast
 - NLP
 - Statistics
 - ML
+- Topic Modeling 
+- Time Series Plots
 
 
 
