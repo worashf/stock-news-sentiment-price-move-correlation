@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-def load_csv_finantial_data(file_path:str) -> pd.DataFrame:
+def load_csv_finantial_news_data(file_path:str) -> pd.DataFrame:
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File {file_path} does not exist")
     try:
@@ -14,4 +14,5 @@ def load_csv_finantial_data(file_path:str) -> pd.DataFrame:
         raise FileNotFoundError(f"File {file_path} does not exist")
     except Exception as e:
         raise e
+
 
