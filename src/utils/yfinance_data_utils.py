@@ -190,8 +190,8 @@ class DataLoader:
             df = self._validate_dates(df)
 
             outliers = self._validate_prices(df, ticker)  # capture outliers
-            if outliers:
-                print(f"Outliers detected for {ticker}: {outliers}")
+            # if outliers:
+            #     print(f"Outliers detected for {ticker}: {outliers}")
 
             self._validate_volume(df, ticker)
             df = self._handle_missing_values(df, ticker)
@@ -233,7 +233,7 @@ if __name__ == "__main__":
         loader = DataLoader()
 
         # Load multiple stocks
-        tickers = ['AAPL', 'MSFT', 'GOOG', 'AMZN', 'NVDA', 'TSLA', 'META', 'INVALID_TICKER']
+        tickers = ['AAPL', 'MSFT', 'GOOG', 'AMZN', 'NVDA', 'TSLA', 'META']
         stock_data = loader.load_multiple_stocks(tickers)
 
         # Display sample of loaded data
