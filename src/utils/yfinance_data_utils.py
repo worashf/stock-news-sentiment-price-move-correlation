@@ -60,51 +60,57 @@ class DataLoader:
                     raise ValueError(f"Failed to convert {col} to {dtype}: {str(e)}")
         return df
 
+    import pandas as pd
+    import warnings
+    from datetime import datetime
+
     def _validate_dates(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Validate and convert date column"""
+        """
+        Validate and normalize the 'Date' column in the DataFrame.
+
+        - Converts 'Date' to datetime.
+        - Removes rows with invalid or future dates.
+        - Adds a normalized 'stock_date' column (date only).
+
+        Parameters:
+            df (pd.DataFrame): Input DataFrame with a 'Date' column.
+
+        Returns:
+            pd.DataFrame: Cleaned DataFrame with valid, past/present dates.
+        """
         if 'Date' not in df.columns:
             return df
 
         try:
-            df['Date'] = pd.to_datetime(df['Date'])
-        except (ValueError, TypeError) as e:
-            raise ValueError(f"Invalid date format: {str(e)}")
+            # Convert to datetime, coercing errors
+            df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+            df['clean_date'] = df['Date']
 
-        # Check for future dates
-        if df['Date'].max() > pd.to_datetime(datetime.now()):
-            warnings.warn("Data contains future dates. These will be removed.")
-            df = df[df['Date'] <= pd.to_datetime(datetime.now())]
+            # Remove rows with invalid dates (NaT)
+            invalid_dates = df['clean_date'].isna()
+            if invalid_dates.any():
+                warnings.warn(f"Removed {invalid_dates.sum()} rows with invalid dates.")
+                df = df[~invalid_dates]
+
+            # Normalize to date only (remove time component)
+            df['clean_date'] = df['clean_date'].dt.date
+
+            # Remove rows with future dates
+            current_date = datetime.now().date()
+            future_dates = df['clean_date'] > current_date
+            if future_dates.any():
+                warnings.warn(f"Removed {future_dates.sum()} rows with future dates.")
+                df = df[~future_dates]
+
+            # Convert back to datetime64[ns] for consistency
+            df['Date'] = pd.to_datetime(df['Date'])
+            df['clean_date'] = pd.to_datetime(df['clean_date'])
+
+        except Exception as e:
+            raise ValueError(f"Date normalization failed: {str(e)}")
 
         return df
 
-    def _validate_prices(self, df: pd.DataFrame, ticker: str) -> dict:
-        """
-        Validate price columns for reasonable values and collect outliers.
-
-        Returns:
-            dict: A dictionary with column names as keys and lists of outlier values.
-        """
-        price_cols = ['Open', 'High', 'Low', 'Close']
-        outliers = {}
-
-        for col in price_cols:
-            if col in df.columns:
-                # Check for negative prices
-                if (df[col] < 0).any():
-                    raise ValueError(f"Negative prices found in {col} for {ticker}")
-
-                median_price = df[col].median()
-                if median_price == 0:
-                    warnings.warn(f"Median price is 0 in {col} for {ticker}, skipping outlier check.")
-                    continue
-
-                # Naive outlier detection: values 10x greater or smaller than median
-                outlier_mask = (df[col] > median_price * 10) | (df[col] < median_price / 10)
-                if outlier_mask.any():
-                    outliers[col] = df.loc[outlier_mask, col].tolist()
-                    warnings.warn(f"Potential price outliers detected in {col} for {ticker}")
-
-        return outliers
 
     def _validate_volume(self, df: pd.DataFrame, ticker: str) -> None:
         """Validate volume column"""
@@ -189,10 +195,6 @@ class DataLoader:
             df = self._convert_dtypes(df)
             df = self._validate_dates(df)
 
-            outliers = self._validate_prices(df, ticker)  # capture outliers
-            # if outliers:
-            #     print(f"Outliers detected for {ticker}: {outliers}")
-
             self._validate_volume(df, ticker)
             df = self._handle_missing_values(df, ticker)
             df = self._clean_data(df, ticker)
@@ -225,6 +227,7 @@ class DataLoader:
             print(f"\nFailed to load {len(failed_tickers)}/{len(tickers)} tickers: {failed_tickers}")
 
         return stock_data
+
 
 
 # Example Usage
